@@ -1,0 +1,8 @@
+[workspace]
+members = ["firmware", "xtask"]
+default-members = ["xtask"]
+resolver = "2"
+
+[workspace.package]
+authors = ["storycraft <storycraft@pancake.sh>"]
+license = "MIT OR Apache 2.0"
