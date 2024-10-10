@@ -2,7 +2,7 @@
 > Improvement of [68keys.io](https://68keys.io).
 > Hotswap compatiable, *blazingly fast*™, less height, inexpensive.
 
-Keyboard firmware for storyboard68 (was previously using (qmk)[https://github.com/storycraft/qmk_firmware/tree/storyboard68/keyboards/storyboard68])
+Keyboard firmware for storyboard68 (was previously using [qmk fork](https://github.com/storycraft/qmk_firmware/tree/storyboard68/keyboards/storyboard68))
 
 See `hardware` directory for PCB and case design.
 
