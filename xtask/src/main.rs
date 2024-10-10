@@ -30,7 +30,7 @@ fn main() {
 
 fn build() -> Result<(), Box<dyn Error>> {
     if !Command::new(cargo_cmd())
-        .args(["+nightly", "build", "--release"])
+        .args(["build", "--release"])
         .current_dir(project_root().join("firmware"))
         .status()?
         .success()
