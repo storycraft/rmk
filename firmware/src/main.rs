@@ -12,8 +12,8 @@ use panic_halt as _;
 
 use core::{cell::UnsafeCell, mem::MaybeUninit};
 
-use arduino_hal::{
-    hal::pins,
+use atmega_hal::{
+    pins,
     pac::{PLL, USB_DEVICE},
     Peripherals,
 };
@@ -22,7 +22,7 @@ use avr_device::{asm::sleep, interrupt};
 use context::Context;
 use usb_device::bus::UsbBusAllocator;
 
-#[arduino_hal::entry]
+#[atmega_hal::entry]
 fn main() -> ! {
     let dp = Peripherals::take().unwrap();
     init_pll(&dp.PLL);

@@ -21,26 +21,10 @@ pub const SETTINGS: HidClassSettings = HidClassSettings {
     locale: HidCountryCode::NotSupported,
 };
 
+#[rustfmt::skip]
 define_matrix!(
     pub struct Matrix {
-        pub inputs: (
-            PB0,
-            PB1,
-            PB2,
-            PB3,
-            PB4,
-            PB5,
-            PB6,
-            PB7,
-            PC6,
-            PC7,
-            PD0,
-            PD1,
-            PD2,
-            PD3,
-            PD4,
-            PD5,
-        ),
-        pub outputs: (PF0, PF1, PF4, PF5, PF6),
+        inputs: (PB0, PB1, PB2, PB3, PB4, PB5, PB6, PB7, PC6, PC7, PD0, PD1, PD2, PD3, PD4, PD5),
+        outputs: (PF0, PF1, PF4, PF5, PF6),
     }
 );

@@ -20,10 +20,10 @@ paste = "1.0.15"
 git = "https://github.com/agausmann/atmega-usbd"
 branch = "master"
 
-[dependencies.arduino-hal]
+[dependencies.atmega-hal]
 git = "https://github.com/rahix/avr-hal"
 branch = "main"
-features = ["arduino-leonardo"]
+features = ["atmega32u4", "rt"]
 
 [dependencies.avr-device]
 version = "0.5.4"

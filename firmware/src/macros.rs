@@ -2,27 +2,27 @@
 macro_rules! define_matrix {
     (
         $vis:vis struct $name:ident {
-            pub inputs: ($($row:ident),* $(,)?),
-            pub outputs: ($($col:ident),* $(,)?) $(,)?
+            inputs: ($($row:ident),* $(,)?),
+            outputs: ($($col:ident),* $(,)?) $(,)?
         }
     ) => {
         $vis struct $name {
-            pub inputs: (
-                $(arduino_hal::port::Pin<
-                    arduino_hal::port::mode::Input<arduino_hal::port::mode::PullUp>,
-                    arduino_hal::hal::port:: $col
+            inputs: (
+                $(atmega_hal::port::Pin<
+                    atmega_hal::port::mode::Input<atmega_hal::port::mode::PullUp>,
+                    atmega_hal::port:: $col
                 >),*
             ),
-            pub outputs: (
-                $(arduino_hal::port::Pin<
-                    arduino_hal::port::mode::Output,
-                    arduino_hal::hal::port:: $row
+            outputs: (
+                $(atmega_hal::port::Pin<
+                    atmega_hal::port::mode::Output,
+                    atmega_hal::port:: $row
                 >),*
             ),
         }
 
         impl $name {
-            pub fn new(pin: arduino_hal::hal::Pins) -> Self {
+            pub fn new(pin: atmega_hal::Pins) -> Self {
                 paste::paste!(
                     Self {
                         inputs: (
@@ -33,6 +33,10 @@ macro_rules! define_matrix {
                         ),
                     }
                 )
+            }
+
+            pub fn scan(&self) {
+
             }
         }
     };
