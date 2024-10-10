@@ -21,6 +21,15 @@ use crate::{
 )]
 impl Context {
     field!(
+        hid: HIDClass<'static, PllUsbBus> = HIDClass::new_with_settings(
+            bus,
+            KeyboardReport::desc(),
+            POLL_MS,
+            SETTINGS
+        )
+    );
+
+    field!(
         device: UsbDevice<'static, PllUsbBus> = UsbDeviceBuilder::new(bus, VID_PID)
             .manufacturer(MANUFACTURER)
             .product(PRODUCT)
@@ -29,19 +38,10 @@ impl Context {
             .build()
     );
 
-    field!(
-        main: HIDClass<'static, PllUsbBus> = HIDClass::new_with_settings(
-            bus,
-            KeyboardReport::desc(),
-            POLL_MS,
-            SETTINGS
-        )
-    );
-
     fn poll(&mut self) {
-        if self.device.poll(&mut [&mut self.main]) {
+        if self.device.poll(&mut [&mut self.hid]) {
             let mut report_buf = [0u8; 1];
-            if self.main.pull_raw_output(&mut report_buf).is_ok() {
+            if self.hid.pull_raw_output(&mut report_buf).is_ok() {
                 report_buf[0] = 2;
             }
         }
