@@ -30,7 +30,7 @@ fn main() {
 
 fn build() -> Result<(), Box<dyn Error>> {
     if !Command::new(cargo_cmd())
-        .args(["build", "--release"])
+        .args(["+nightly", "build", "--release"])
         .current_dir(project_root().join("firmware"))
         .status()?
         .success()
@@ -98,5 +98,5 @@ fn project_root() -> PathBuf {
 }
 
 fn target_release() -> PathBuf {
-    project_root().join("target/atmega32u4/release")
+    project_root().join("firmware/target/atmega32u4/release")
 }
