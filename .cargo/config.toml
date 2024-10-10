@@ -1,2 +1,5 @@
+[build]
+target = "firmware/atmega32u4.json"
+
 [alias]
 xtask = "run --package xtask --"
