@@ -56,7 +56,7 @@ fn deploy() -> Result<(), Box<dyn Error>> {
     let release = target_release();
 
     if !Command::new("dfu-programmer")
-        .args(["atmega32u4", "flash", "storyboard68.hex"])
+        .args(["atmega32u4", "flash", "--force", "storyboard68.hex"])
         .current_dir(&release)
         .status()?
         .success()
