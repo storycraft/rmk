@@ -4,7 +4,6 @@
 
 mod config;
 mod context;
-mod key;
 mod macros;
 
 use config::Matrix;

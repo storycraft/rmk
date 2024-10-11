@@ -1,5 +1,9 @@
 [workspace]
-members = ["build/*"]
+members = ["build/*", "common/*"]
 exclude = ["firmware"]
 default-members = ["build/xtask"]
 resolver = "2"
+
+[workspace.package]
+authors = ["storycraft <storycraft@pancake.sh>"]
+license = "MIT OR Apache 2.0"
