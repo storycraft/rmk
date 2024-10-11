@@ -1,5 +1,5 @@
 [workspace]
-members = ["xtask"]
+members = ["build/*"]
 exclude = ["firmware"]
-default-members = ["xtask"]
+default-members = ["build/xtask"]
 resolver = "2"
