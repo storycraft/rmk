@@ -267,23 +267,50 @@ pub enum HidKey {
     KcKpComma = 0x85,
     KcKpEqualAs400 = 0x86,
 
-    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_1", alias = "KC_INT1"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "KC_INTERNATIONAL_1", alias = "KC_INT1")
+    )]
     KcInternational1 = 0x87,
-    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_2", alias = "KC_INT2"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "KC_INTERNATIONAL_2", alias = "KC_INT2")
+    )]
     KcInternational2 = 0x88,
-    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_3", alias = "KC_INT3"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "KC_INTERNATIONAL_3", alias = "KC_INT3")
+    )]
     KcInternational3 = 0x89,
-    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_4", alias = "KC_INT4"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "KC_INTERNATIONAL_4", alias = "KC_INT4")
+    )]
     KcInternational4 = 0x8A,
-    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_5", alias = "KC_INT5"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "KC_INTERNATIONAL_5", alias = "KC_INT5")
+    )]
     KcInternational5 = 0x8B,
-    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_6", alias = "KC_INT6"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "KC_INTERNATIONAL_6", alias = "KC_INT6")
+    )]
     KcInternational6 = 0x8C,
-    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_7", alias = "KC_INT7"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "KC_INTERNATIONAL_7", alias = "KC_INT7")
+    )]
     KcInternational7 = 0x8D,
-    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_8", alias = "KC_INT8"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "KC_INTERNATIONAL_8", alias = "KC_INT8")
+    )]
     KcInternational8 = 0x8E,
-    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_9", alias = "KC_INT9"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "KC_INTERNATIONAL_9", alias = "KC_INT9")
+    )]
     KcInternational9 = 0x8F,
 
     #[cfg_attr(feature = "serde", serde(rename = "KC_LANGUAGE_1", alias = "KC_LNG1"))]

@@ -2,18 +2,15 @@ use core::{cell::UnsafeCell, mem::MaybeUninit};
 
 use impl_opaque::opaque;
 use usb_device::{
-    bus::UsbBusAllocator,
-    device::{UsbDevice, UsbDeviceBuilder},
+    bus::{UsbBus, UsbBusAllocator},
+    device::{UsbDevice, UsbDeviceBuilder, UsbVidPid},
 };
 use usbd_hid::{
     descriptor::{KeyboardReport, SerializedDescriptor},
     hid_class::HIDClass,
 };
 
-use crate::{
-    config::{MANUFACTURER, POLL_MS, PRODUCT, SERIAL_NUMBER, SETTINGS, VERSION, VID_PID},
-    PllUsbBus,
-};
+use crate::{PllUsbBus, CONFIG};
 
 #[opaque(
     as pub,
@@ -21,22 +18,13 @@ use crate::{
 )]
 impl Context {
     field!(
-        hid: HIDClass<'static, PllUsbBus> = HIDClass::new_with_settings(
+        hid: HIDClass<'static, PllUsbBus> = HIDClass::new(
             bus,
             KeyboardReport::desc(),
-            POLL_MS,
-            SETTINGS
-        )
+            CONFIG.hid.poll_ms)
     );
 
-    field!(
-        device: UsbDevice<'static, PllUsbBus> = UsbDeviceBuilder::new(bus, VID_PID)
-            .manufacturer(MANUFACTURER)
-            .product(PRODUCT)
-            .serial_number(SERIAL_NUMBER)
-            .device_release(VERSION)
-            .build()
-    );
+    field!(device: UsbDevice<'static, PllUsbBus> = build_from_config(bus).build());
 
     fn poll(&mut self) {
         if self.device.poll(&mut [&mut self.hid]) {
@@ -46,6 +34,29 @@ impl Context {
             }
         }
     }
+}
+
+fn build_from_config<B: UsbBus>(bus: &UsbBusAllocator<B>) -> UsbDeviceBuilder<B> {
+    let mut builder =
+        UsbDeviceBuilder::new(bus, UsbVidPid(CONFIG.descriptor.vid, CONFIG.descriptor.pid));
+
+    if let Some(manufacturer) = CONFIG.descriptor.manufacturer {
+        builder = builder.manufacturer(manufacturer);
+    }
+
+    if let Some(product) = CONFIG.descriptor.product {
+        builder = builder.product(product);
+    }
+
+    if let Some(serial_number) = CONFIG.descriptor.serial_number {
+        builder = builder.serial_number(serial_number);
+    }
+
+    if let Some(version) = CONFIG.descriptor.version {
+        builder = builder.device_release(version);
+    }
+
+    builder
 }
 
 const _: () = {
@@ -62,7 +73,7 @@ const _: () = {
         }
 
         pub fn get_mut() -> &'static mut Self {
-            unsafe { (&mut *GLOBAL.0.get()).assume_init_mut() }
+            unsafe { (*GLOBAL.0.get()).assume_init_mut() }
         }
 
         #[inline(always)]

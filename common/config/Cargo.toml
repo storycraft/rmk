@@ -1,0 +1,13 @@
+[package]
+name = "usb-keyboard-config"
+version = "0.1.0"
+edition = "2021"
+authors.workspace = true
+license.workspace = true
+publish = false
+
+[features]
+build = ["dep:serde"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"], optional = true }

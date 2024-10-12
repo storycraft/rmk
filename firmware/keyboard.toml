@@ -1,0 +1,10 @@
+vid = 0xFEED
+pid = 0x0A0C
+
+manufacturer = "pancake.sh"
+product = "Storyboard Keyboard"
+version = 0
+serial_number = "0"
+
+nkro = true
+poll_ms = 1

@@ -2,17 +2,14 @@
 #![no_main]
 #![feature(abi_avr_interrupt)]
 
-mod config;
 mod context;
 mod macros;
 
-use config::Matrix;
 use panic_halt as _;
 
 use core::{cell::UnsafeCell, mem::MaybeUninit};
 
 use atmega_hal::{
-    pins,
     pac::{PLL, USB_DEVICE},
     Peripherals,
 };
@@ -20,6 +17,9 @@ use atmega_usbd::UsbBus;
 use avr_device::{asm::sleep, interrupt};
 use context::Context;
 use usb_device::bus::UsbBusAllocator;
+use usb_keyboard_config::Configuration;
+
+const CONFIG: Configuration = include!(concat!(env!("OUT_DIR"), "/config.rs"));
 
 #[atmega_hal::entry]
 fn main() -> ! {
@@ -28,8 +28,6 @@ fn main() -> ! {
 
     // Initialize global context
     Context::init(Context::new(init_usb_bus(dp.USB_DEVICE, dp.PLL)));
-
-    let _matrix = Matrix::new(pins!(dp));
 
     unsafe {
         interrupt::enable();

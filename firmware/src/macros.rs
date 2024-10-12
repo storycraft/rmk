@@ -42,4 +42,3 @@ macro_rules! define_matrix {
     };
 }
 
-pub(crate) use define_matrix;
