@@ -13,7 +13,7 @@ pub enum Key {
 
     Quantum(QmkKey),
     Layer(LayerKey),
-    Code(BasicKey),
+    Hid(HidKey),
 }
 
 impl From<QmkKey> for Key {
@@ -28,9 +28,9 @@ impl From<LayerKey> for Key {
     }
 }
 
-impl From<BasicKey> for Key {
-    fn from(value: BasicKey) -> Self {
-        Self::Code(value)
+impl From<HidKey> for Key {
+    fn from(value: HidKey) -> Self {
+        Self::Hid(value)
     }
 }
 
@@ -54,13 +54,16 @@ pub enum QmkKey {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "SCREAMING_SNAKE_CASE"))]
 #[allow(unused)]
-pub enum LayerKey {}
+pub enum LayerKey {
+    #[cfg_attr(feature = "serde", serde(alias = "MO"))]
+    Modifier(u8),
+}
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "SCREAMING_SNAKE_CASE"))]
 #[allow(unused)]
-pub enum BasicKey {
+pub enum HidKey {
     #[cfg_attr(feature = "serde", serde(alias = "XXXXXXX"))]
     KcNo = 0x00,
 
@@ -264,10 +267,135 @@ pub enum BasicKey {
     KcKpComma = 0x85,
     KcKpEqualAs400 = 0x86,
 
-    
+    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_1", alias = "KC_INT1"))]
+    KcInternational1 = 0x87,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_2", alias = "KC_INT2"))]
+    KcInternational2 = 0x88,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_3", alias = "KC_INT3"))]
+    KcInternational3 = 0x89,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_4", alias = "KC_INT4"))]
+    KcInternational4 = 0x8A,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_5", alias = "KC_INT5"))]
+    KcInternational5 = 0x8B,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_6", alias = "KC_INT6"))]
+    KcInternational6 = 0x8C,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_7", alias = "KC_INT7"))]
+    KcInternational7 = 0x8D,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_8", alias = "KC_INT8"))]
+    KcInternational8 = 0x8E,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_INTERNATIONAL_9", alias = "KC_INT9"))]
+    KcInternational9 = 0x8F,
+
+    #[cfg_attr(feature = "serde", serde(rename = "KC_LANGUAGE_1", alias = "KC_LNG1"))]
+    KcLanguage1 = 0x90,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_LANGUAGE_2", alias = "KC_LNG2"))]
+    KcLanguage2 = 0x91,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_LANGUAGE_3", alias = "KC_LNG3"))]
+    KcLanguage3 = 0x92,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_LANGUAGE_4", alias = "KC_LNG4"))]
+    KcLanguage4 = 0x93,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_LANGUAGE_5", alias = "KC_LNG5"))]
+    KcLanguage5 = 0x94,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_LANGUAGE_6", alias = "KC_LNG6"))]
+    KcLanguage6 = 0x95,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_LANGUAGE_7", alias = "KC_LNG7"))]
+    KcLanguage7 = 0x96,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_LANGUAGE_8", alias = "KC_LNG8"))]
+    KcLanguage8 = 0x97,
+    #[cfg_attr(feature = "serde", serde(rename = "KC_LANGUAGE_9", alias = "KC_LNG9"))]
+    KcLanguage9 = 0x98,
+
+    #[cfg_attr(feature = "serde", serde(alias = "KC_ERAS"))]
+    KcAlternateErase = 0x99,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_SYRQ"))]
+    KcSystemRequest = 0x9A,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_CNCL"))]
+    KcCancel = 0x9B,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_CLR"))]
+    KcClear = 0x9C,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_PRIR"))]
+    KcPrior = 0x9D,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_RETN"))]
+    KcReturn = 0x9E,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_SEPR"))]
+    KcSeparator = 0x9F,
+    KcOut = 0xA0,
+    KcOper = 0xA1,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_CLAG"))]
+    KcClearAgain = 0xA2,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_CRSL"))]
+    KcCrsel = 0xA3,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_EXSL"))]
+    KcExsel = 0xA4,
+
+    #[cfg_attr(feature = "serde", serde(alias = "KC_PWR"))]
+    KcSystemPower = 0xA5,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_SLEP"))]
+    KcSystemSleep = 0xA6,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_WAKE"))]
+    KcSystemWake = 0xA7,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_MUTE"))]
+    KcAudioMute = 0xA8,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_VOLU"))]
+    KcAudioVolUp = 0xA9,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_VOLD"))]
+    KcAudioVolDown = 0xAA,
+
+    #[cfg_attr(feature = "serde", serde(alias = "KC_MNXT"))]
+    KcMediaNextTrack = 0xAB,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_MPRV"))]
+    KcMediaPrevTrack = 0xAC,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_MSTP"))]
+    KcMediaStop = 0xAD,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_MPLY"))]
+    KcMediaPlayPause = 0xAE,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_MSEL"))]
+    KcMediaSelect = 0xAF,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_EJCT"))]
+    KcMediaEject = 0xB0,
+
+    KcMail = 0xB1,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_CALC"))]
+    KcCalculator = 0xB2,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_MYCM"))]
+    KcMyComputer = 0xB3,
+
+    #[cfg_attr(feature = "serde", serde(alias = "KC_WSCH"))]
+    KcWwwSearch = 0xB4,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_WHOM"))]
+    KcWwwHome = 0xB5,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_WBAK"))]
+    KcWwwBack = 0xB6,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_WFWD"))]
+    KcWwwForward = 0xB7,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_WSTP"))]
+    KcWwwStop = 0xB8,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_WREF"))]
+    KcWwwRefresh = 0xB9,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_WFAV"))]
+    KcWwwFavorites = 0xBA,
+
+    #[cfg_attr(feature = "serde", serde(alias = "KC_MFFD"))]
+    KcMediaFastFoward = 0xBB,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_MRWD"))]
+    KcMediaRewind = 0xBC,
+
+    #[cfg_attr(feature = "serde", serde(alias = "KC_BRIU"))]
+    KcBrightnessUp = 0xBD,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_BRID"))]
+    KcBrightnessDown = 0xBE,
+
+    #[cfg_attr(feature = "serde", serde(alias = "KC_CPNL"))]
+    KcControlPanel = 0xBF,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_ASST"))]
+    KcAssistant = 0xC0,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_MCTL"))]
+    KcMissionControl = 0xC1,
+    #[cfg_attr(feature = "serde", serde(alias = "KC_LAPD"))]
+    KcLaunchpad = 0xC2,
 }
 
-impl BasicKey {
+impl HidKey {
     pub const fn keycode(self) -> u8 {
         self as _
     }
