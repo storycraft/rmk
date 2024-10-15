@@ -10,9 +10,9 @@ See `hardware` directory for PCB and case design.
 AVR GCC Toolchain, dfu-programmer
 
 ## Building and flashing
-Run `cargo xtask build` to build firmware as elf and hex (can be found at `target/atmega32u4/release`)
+Run `cargo xtask build storyboard68` to build firmware as elf and hex
 
-Run `cargo xtask deploy` to build and flash firmware into device directly
+Run `cargo xtask deploy storyboard68` to build and flash firmware into device directly
 
 ## License
 The project is licensed under MIT or Apache-2.0
