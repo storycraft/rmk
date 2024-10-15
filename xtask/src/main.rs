@@ -6,7 +6,6 @@ use std::{
     process::{Command, Stdio},
 };
 
-use camino::Utf8PathBuf;
 use cargo_metadata::{Artifact, Message};
 use clap::{error::ErrorKind, CommandFactory, Parser, ValueEnum};
 
@@ -47,9 +46,13 @@ fn main() {
     }
 }
 
-fn build(keyboard: &str) -> Result<Option<Utf8PathBuf>, Box<dyn Error>> {
+fn build(keyboard: &str) -> Result<Artifact, Box<dyn Error>> {
     let mut build_cmd = Command::new(cargo_cmd())
-        .args(["build", "--release"])
+        .args([
+            "build",
+            "--release",
+            "--message-format=json-render-diagnostics",
+        ])
         .current_dir(
             project_root()
                 .join("firmware")
@@ -61,15 +64,16 @@ fn build(keyboard: &str) -> Result<Option<Utf8PathBuf>, Box<dyn Error>> {
 
     let reader = BufReader::new(build_cmd.stdout.take().unwrap());
 
-    let mut exec_path = None::<Utf8PathBuf>;
-
+    let mut artifact = None::<Artifact>;
     for res in cargo_metadata::Message::parse_stream(reader) {
-        if let Message::CompilerArtifact(Artifact {
-            executable: Some(executable),
-            ..
-        }) = res?
+        if let Message::CompilerArtifact(
+            exec_artifact @ Artifact {
+                executable: Some(_),
+                ..
+            },
+        ) = res?
         {
-            exec_path = Some(executable);
+            artifact = Some(exec_artifact);
         }
     }
 
@@ -77,40 +81,40 @@ fn build(keyboard: &str) -> Result<Option<Utf8PathBuf>, Box<dyn Error>> {
         return Err("build process terminated unexpectedly".into());
     }
 
-    if let Some(ref exec) = exec_path {
-        let hex_file_name = format!("{}.hex", exec.file_name().unwrap_or("firmware"));
-        let output_dir = exec.ancestors().nth(1).unwrap();
+    let Some(artifact) = artifact else {
+        return Err("compile process did not produced any artifact".into());
+    };
 
-        if !Command::new("avr-objcopy")
-            .args([
-                "-O",
-                "ihex",
-                exec.as_str(),
-                output_dir.join(hex_file_name).as_str(),
-            ])
-            .current_dir(target_release())
-            .status()?
-            .success()
-        {
-            return Err("hex file generation failed".into());
-        }
-    }
+    let exec = artifact.executable.as_ref().unwrap();
+    let hex_file_name = format!("{}.hex", exec.file_stem().unwrap_or("firmware"));
+    let output_dir = exec.ancestors().nth(1).unwrap();
 
-    Ok(exec_path)
-}
-
-fn deploy(keyboard: &str) -> Result<(), Box<dyn Error>> {
-    let executables = build(keyboard)?;
-
-    let release = target_release();
-
-    if !Command::new("dfu-programmer")
-        .args(["atmega32u4", "erase", "--force"])
-        .current_dir(&release)
+    if !Command::new("avr-objcopy")
+        .args([
+            "-O",
+            "ihex",
+            exec.as_str(),
+            output_dir.join(hex_file_name).as_str(),
+        ])
+        .current_dir(output_dir)
         .status()?
         .success()
     {
-        return Err("flash preparation process terminated unexpectedly.".into());
+        return Err("hex file generation failed".into());
+    }
+
+    Ok(artifact)
+}
+
+fn deploy(keyboard: &str) -> Result<(), Box<dyn Error>> {
+    let artifact = build(keyboard)?;
+
+    if !Command::new("dfu-programmer")
+        .args(["atmega32u4", "erase", "--force"])
+        .status()?
+        .success()
+    {
+        return Err("flash preparation process terminated unexpectedly".into());
     }
 
     if !Command::new("dfu-programmer")
@@ -118,9 +122,7 @@ fn deploy(keyboard: &str) -> Result<(), Box<dyn Error>> {
             "atmega32u4",
             "flash",
             "--force",
-            executables
-                .ok_or("cannot find any built artifact")?
-                .as_str(),
+            artifact.executable.as_ref().unwrap().as_str(),
         ])
         .status()?
         .success()
@@ -130,7 +132,6 @@ fn deploy(keyboard: &str) -> Result<(), Box<dyn Error>> {
 
     if !Command::new("dfu-programmer")
         .args(["atmega32u4", "reset"])
-        .current_dir(&release)
         .status()?
         .success()
     {
@@ -150,8 +151,4 @@ fn project_root() -> PathBuf {
         .nth(1)
         .unwrap()
         .to_path_buf()
-}
-
-fn target_release() -> PathBuf {
-    project_root().join("firmware/target/atmega32u4/release")
 }
