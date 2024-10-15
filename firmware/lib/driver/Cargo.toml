@@ -1,5 +1,6 @@
 [package]
-name = "xtask"
+name = "keyboard-driver"
+description = "keyboard driver"
 version = "0.1.0"
 edition = "2021"
 authors = { workspace = true }
@@ -7,4 +8,3 @@ license = { workspace = true }
 publish = false
 
 [dependencies]
-clap = { version = "4", features = ["derive"] }

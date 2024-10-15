@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "atmega-hal"
 version = "0.1.0"
-source = "git+https://github.com/rahix/avr-hal?branch=main#544e50bdf2c1944281d9f63fa9ef3ccf68b5f684"
+source = "git+https://github.com/rahix/avr-hal?branch=main#7e21ea0a468daee5cff9bed1c090a5e50e6879ff"
 dependencies = [
  "avr-device",
  "avr-hal-generic",
@@ -46,7 +46,7 @@ dependencies = [
 [[package]]
 name = "avr-hal-generic"
 version = "0.1.0"
-source = "git+https://github.com/rahix/avr-hal?branch=main#544e50bdf2c1944281d9f63fa9ef3ccf68b5f684"
+source = "git+https://github.com/rahix/avr-hal?branch=main#7e21ea0a468daee5cff9bed1c090a5e50e6879ff"
 dependencies = [
  "avr-device",
  "cfg-if",
@@ -198,6 +198,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "keyboard-driver"
+version = "0.1.0"
+
+[[package]]
 name = "memchr"
 version = "2.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -250,9 +254,9 @@ dependencies = [
 
 [[package]]
 name = "rustversion"
-version = "1.0.17"
+version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "955d28af4278de8121b7ebeb796b6a45735dc01436d898801014aced2773a3d6"
+checksum = "0e819f2bc632f285be6d7cd36e25940d45b2391dd6d9b939e79de557f7014248"
 
 [[package]]
 name = "serde"

@@ -3,7 +3,6 @@
 #![feature(abi_avr_interrupt)]
 
 mod context;
-mod macros;
 
 use panic_halt as _;
 

@@ -1,39 +1,13 @@
-[package]
-name = "storyboard68"
-description = "storyboard68 keyboard firmware"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = ["lib/*", "keyboard/*"]
+resolver = "2"
+
+[workspace.package]
 authors = ["storycraft <storycraft@pancake.sh>"]
 license = "MIT OR Apache 2.0"
-publish = false
 
-[dependencies]
+[workspace.dependencies]
+keyboard-driver = { path = "./lib/driver" }
+
 hid-key = { path = "../common/hid-key" }
 usb-keyboard-config = { path = "../common/config" }
-
-panic-halt = "0.2.0"
-nb = "1.1"
-embedded-hal = "1.0"
-usb-device = "0.2.9"
-usbd-hid = "0.6"
-impl-opaque = "0.5.0"
-paste = "1.0.15"
-avr-progmem = "0.4.0"
-
-[dependencies.atmega-usbd]
-git = "https://github.com/agausmann/atmega-usbd"
-branch = "master"
-
-[dependencies.atmega-hal]
-git = "https://github.com/rahix/avr-hal"
-branch = "main"
-features = ["atmega32u4", "rt"]
-
-[dependencies.avr-device]
-version = "0.5.4"
-features = ["atmega32u4", "rt"]
-
-[build-dependencies]
-usb-keyboard-config = { path = "../common/config", features = ["build"] }
-
-toml = { version = "0.8.19", features = ["parse"] }
