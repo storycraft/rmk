@@ -1,18 +1,10 @@
-# `Storyboard68`
-> Improvement of [68keys.io](https://68keys.io).
-> Hotswap compatiable, *blazingly fast*™, less height, inexpensive.
+# Rust Mechanical Keyboard
+Blazingly fast and lightweight keyboard firmware
 
-Keyboard firmware for storyboard68 (was previously using [qmk fork](https://github.com/storycraft/qmk_firmware/tree/storyboard68/keyboards/storyboard68))
+## Workspace commands
+Run `cargo xtask build <keyboard_name>` to build firmware of `<keyboard_name>`
 
-See `hardware` directory for PCB and case design.
-
-## Requirements
-AVR GCC Toolchain, dfu-programmer
-
-## Building and flashing
-Run `cargo xtask build storyboard68` to build firmware as elf and hex
-
-Run `cargo xtask deploy storyboard68` to build and flash firmware into device directly
+Run `cargo xtask deploy <keyboard_name>` to build and flash firmware of `<keyboard_name>`
 
 ## License
-The project is licensed under MIT or Apache-2.0
+The project libraries (excluding underlying keyboard firmwares unless specified) are licensed under MIT or Apache-2.0
