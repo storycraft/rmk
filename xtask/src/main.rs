@@ -1,13 +1,22 @@
+mod config;
+mod keyboard;
+mod template;
+
 use std::{
-    env,
-    error::Error,
-    io::BufReader,
+    env, fs,
     path::{Path, PathBuf},
-    process::{Command, Stdio},
 };
 
-use cargo_metadata::{Artifact, Message};
-use clap::{error::ErrorKind, CommandFactory, Parser, ValueEnum};
+use anyhow::{bail, Context};
+use clap::{Parser, ValueEnum};
+use config::{BuildConfig, Config};
+use handlebars::Handlebars;
+use keyboard::Keyboard;
+use serde::Serialize;
+use subprocess::Exec;
+use template::{Executable, PathContext};
+use tracing::{event, instrument, level_filters::LevelFilter, Level};
+use tracing_subscriber::{fmt::format, layer::SubscriberExt, util::SubscriberInitExt};
 
 #[derive(Debug, Parser)]
 #[command(name = "xtask")]
@@ -34,121 +43,137 @@ enum BuildOptions {
 }
 
 fn main() {
-    let cmd = KeyboardCommand::parse();
+    tracing_subscriber::registry()
+        .with(LevelFilter::INFO)
+        .with(tracing_subscriber::fmt::layer().event_format(format().compact().without_time()))
+        .try_init()
+        .unwrap();
 
-    let res: Result<(), Box<dyn Error>> = match cmd.options {
-        BuildOptions::Build => build(&cmd.keyboard).map(|_| ()),
-        BuildOptions::Deploy => deploy(&cmd.keyboard),
-    };
-
-    if let Err(err) = res {
-        KeyboardCommand::command().error(ErrorKind::Io, err).exit();
+    if let Err(err) = run(KeyboardCommand::parse()) {
+        event!(Level::ERROR, "{:?}", err);
     }
 }
 
-fn build(keyboard: &str) -> Result<Artifact, Box<dyn Error>> {
-    let mut build_cmd = Command::new(cargo_cmd())
-        .args([
-            "build",
-            "--release",
-            "--message-format=json-render-diagnostics",
-        ])
-        .current_dir(
-            project_root()
-                .join("firmware")
-                .join("keyboard")
-                .join(keyboard),
-        )
-        .stdout(Stdio::piped())
-        .spawn()?;
+fn run(cmd: KeyboardCommand) -> anyhow::Result<()> {
+    let keyboard = keyboard_dir();
+    let keyboard = Keyboard::new(&keyboard, &cmd.keyboard);
 
-    let reader = BufReader::new(build_cmd.stdout.take().unwrap());
+    event!(Level::INFO, "keyboard: {}", keyboard.name());
+    event!(
+        Level::INFO,
+        "firmware_directory: {}",
+        keyboard.path().display()
+    );
 
-    let mut artifact = None::<Artifact>;
-    for res in cargo_metadata::Message::parse_stream(reader) {
-        if let Message::CompilerArtifact(
-            exec_artifact @ Artifact {
-                executable: Some(_),
-                ..
-            },
-        ) = res?
-        {
-            artifact = Some(exec_artifact);
+    let config = {
+        let path = keyboard.path().join("xtask.toml");
+
+        if fs::exists(&path)? {
+            toml::from_str(&fs::read_to_string(&path).context("cannot read xtask.toml")?)
+                .context("configuration file is invalid")?
+        } else {
+            Config::default()
         }
-    }
-
-    if !build_cmd.wait()?.success() {
-        return Err("build process terminated unexpectedly".into());
-    }
-
-    let Some(artifact) = artifact else {
-        return Err("compile process did not produced any artifact".into());
     };
 
-    let exec = artifact.executable.as_ref().unwrap();
-    let hex_file_name = format!("{}.hex", exec.file_stem().unwrap_or("firmware"));
-    let output_dir = exec.ancestors().nth(1).unwrap();
+    match cmd.options {
+        BuildOptions::Build => {
+            build(&keyboard, &config.build)?;
+        }
 
-    if !Command::new("avr-objcopy")
-        .args([
-            "-O",
-            "ihex",
-            exec.as_str(),
-            output_dir.join(hex_file_name).as_str(),
-        ])
-        .current_dir(output_dir)
-        .status()?
-        .success()
-    {
-        return Err("hex file generation failed".into());
-    }
+        BuildOptions::Deploy => {
+            deploy(&keyboard, &config)?;
+        }
+    };
 
-    Ok(artifact)
+    Ok(())
 }
 
-fn deploy(keyboard: &str) -> Result<(), Box<dyn Error>> {
-    let artifact = build(keyboard)?;
-
-    if !Command::new("dfu-programmer")
-        .args(["atmega32u4", "erase", "--force"])
-        .status()?
-        .success()
-    {
-        return Err("flash preparation process terminated unexpectedly".into());
+#[instrument(level = Level::INFO, skip_all)]
+fn deploy(keyboard: &Keyboard<'_>, config: &Config) -> anyhow::Result<()> {
+    #[derive(Serialize)]
+    struct DeployContext {
+        pub path: PathContext,
+        pub exec: Executable,
     }
 
-    if !Command::new("dfu-programmer")
-        .args([
-            "atmega32u4",
-            "flash",
-            "--force",
-            artifact.executable.as_ref().unwrap().as_str(),
-        ])
-        .status()?
-        .success()
-    {
-        return Err("flash process terminated unexpectedly".into());
+    if config.deploy.cmds.is_empty() {
+        bail!("deploy commands are not configured")
     }
 
-    if !Command::new("dfu-programmer")
-        .args(["atmega32u4", "reset"])
-        .status()?
-        .success()
-    {
-        return Err("device reset failed".into());
+    let exec = build(keyboard, &config.build)?;
+
+    event!(Level::INFO, "running deploy process");
+    run_cmds(
+        &config.deploy.cmds,
+        DeployContext {
+            path: PathContext::new(),
+            exec,
+        },
+    )
+    .context("deploy failed")?;
+
+    Ok(())
+}
+
+#[instrument(level = Level::INFO, skip_all)]
+fn build(keyboard: &Keyboard, config: &BuildConfig) -> anyhow::Result<Executable> {
+    #[derive(Serialize)]
+    struct PostBuildContext {
+        pub path: PathContext,
+        pub exec: Executable,
+    }
+
+    event!(Level::INFO, "running pre-build commands");
+    run_cmds(&config.pre_commands, ()).context("pre-build commands failed")?;
+
+    event!(Level::INFO, "running build process");
+    let artifact = keyboard.build().context("firmware build failed")?;
+
+    let exec = Executable::new_from_path(artifact.executable.as_ref().unwrap().clone()).unwrap();
+
+    let cx = PostBuildContext {
+        path: PathContext::new(),
+        exec,
+    };
+
+    event!(Level::INFO, "running post-build commands");
+    run_cmds(&config.post_commands, &cx).context("post-build commands failed")?;
+
+    event!(Level::INFO, "target: {}", artifact.target.name);
+    event!(Level::INFO, "artifacts: {:?}", artifact.filenames);
+    event!(
+        Level::INFO,
+        "executable: {}",
+        artifact.executable.as_ref().unwrap()
+    );
+
+    Ok(cx.exec)
+}
+
+fn run_cmds(cmds: &[String], context: impl Serialize) -> anyhow::Result<()> {
+    let reg = Handlebars::new();
+
+    for cmd in cmds {
+        let proc = Exec::shell(reg.render_template(cmd, &context)?);
+
+        if !proc
+            .join()
+            .with_context(|| format!("command: {} ended unexpectedly", cmd))?
+            .success()
+        {
+            bail!("command: {} ended with error", cmd);
+        }
     }
 
     Ok(())
 }
 
-fn cargo_cmd() -> String {
-    env::var("CARGO").unwrap_or_else(|_| "cargo".to_string())
-}
-
-fn project_root() -> PathBuf {
+pub fn keyboard_dir() -> PathBuf {
     Path::new(&env!("CARGO_MANIFEST_DIR"))
         .ancestors()
         .nth(1)
         .unwrap()
-        .to_path_buf()
+        .join("firmware")
+        .join("keyboard")
 }
