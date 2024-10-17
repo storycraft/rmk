@@ -11,11 +11,11 @@ pub struct Config {
 pub struct BuildConfig {
     #[serde(default)]
     /// Commands running before build process
-    pub pre_commands: Vec<String>,
+    pub pre_cmds: Vec<String>,
 
     #[serde(default)]
     /// Commands running after build process
-    pub post_commands: Vec<String>,
+    pub post_cmds: Vec<String>,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]

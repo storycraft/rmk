@@ -1,11 +1,11 @@
 [build]
-pre_commands = []
-post_commands = [
+pre_cmds = []
+post_cmds = [
     "avr-objcopy -O ihex {{exec.full_path}} {{exec.directory}}{{path.separator}}{{exec.name}}.hex"
 ]
 
 [deploy]
-commands = [
+cmds = [
     "dfu-programmer atmega32u4 erase --force",
     "dfu-programmer flash --force {{exec.full_path}}",
     "dfu-programmer atmega32u4 reset",
