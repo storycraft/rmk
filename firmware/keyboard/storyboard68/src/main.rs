@@ -20,7 +20,6 @@ use usb_keyboard_config::Configuration;
 
 const CONFIG: Configuration = include!(concat!(env!("OUT_DIR"), "/config.rs"));
 
-#[atmega_hal::entry]
 fn main() -> ! {
     let dp = Peripherals::take().unwrap();
     init_pll(&dp.PLL);
@@ -64,10 +63,10 @@ fn init_usb_bus(usb: USB_DEVICE, pll: PLL) -> &'static UsbBusAllocator<PllUsbBus
 
 #[interrupt(atmega32u4)]
 fn USB_GEN() {
-    Context::interrupt_poll()
+    unsafe { Context::interrupt_poll() }
 }
 
 #[interrupt(atmega32u4)]
 fn USB_COM() {
-    Context::interrupt_poll()
+    unsafe { Context::interrupt_poll() }
 }

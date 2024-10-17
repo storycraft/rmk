@@ -34,6 +34,4 @@ version = "0.5.4"
 features = ["atmega32u4", "rt"]
 
 [build-dependencies]
-usb-keyboard-config = { workspace = true, features = ["build"] }
-
-toml = { version = "0.8.19", features = ["parse"] }
+create-rmk-build = { workspace = true }

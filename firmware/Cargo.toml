@@ -8,6 +8,7 @@ license = "MIT OR Apache 2.0"
 
 [workspace.dependencies]
 keyboard-driver = { path = "./lib/driver" }
+create-rmk-build = { path = "./lib/create-rmk-build" }
 
 hid-key = { path = "../common/hid-key" }
 usb-keyboard-config = { path = "../common/config" }

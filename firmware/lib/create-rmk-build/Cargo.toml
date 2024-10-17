@@ -1,0 +1,12 @@
+[package]
+name = "create-rmk-build"
+description = "Rmk Keyboard buildscript boilerplate"
+version = "0.1.0"
+edition = "2021"
+authors = { workspace = true }
+license = { workspace = true }
+publish = false
+
+[dependencies]
+usb-keyboard-config = { workspace = true, features = ["build"] }
+toml = { version = "0.8.19", features = ["parse"] }
