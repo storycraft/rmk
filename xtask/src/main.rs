@@ -125,7 +125,7 @@ fn build(keyboard: &Keyboard, config: &BuildConfig) -> anyhow::Result<Executable
     }
 
     event!(Level::INFO, "running pre-build commands");
-    run_cmds(&config.pre_commands, ()).context("pre-build commands failed")?;
+    run_cmds(&config.pre_cmds, ()).context("pre-build commands failed")?;
 
     event!(Level::INFO, "running build process");
     let artifact = keyboard.build().context("firmware build failed")?;
@@ -138,7 +138,7 @@ fn build(keyboard: &Keyboard, config: &BuildConfig) -> anyhow::Result<Executable
     };
 
     event!(Level::INFO, "running post-build commands");
-    run_cmds(&config.post_commands, &cx).context("post-build commands failed")?;
+    run_cmds(&config.post_cmds, &cx).context("post-build commands failed")?;
 
     event!(Level::INFO, "target: {}", artifact.target.name);
     event!(Level::INFO, "artifacts: {:?}", artifact.filenames);
