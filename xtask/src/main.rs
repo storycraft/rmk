@@ -8,7 +8,7 @@ use std::{
 };
 
 use anyhow::{bail, Context};
-use clap::{Parser, ValueEnum};
+use clap::{Args, Parser, Subcommand};
 use config::{BuildConfig, Config};
 use handlebars::Handlebars;
 use keyboard::Keyboard;
@@ -18,28 +18,39 @@ use template::{Executable, PathContext};
 use tracing::{event, instrument, level_filters::LevelFilter, Level};
 use tracing_subscriber::{fmt::format, layer::SubscriberExt, util::SubscriberInitExt};
 
-#[derive(Debug, Parser)]
+#[derive(Parser)]
 #[command(name = "xtask")]
 #[command(about = "storyboard68 xtask")]
-struct KeyboardCommand {
-    #[arg(name = "options", help = "firmware build options")]
-    options: BuildOptions,
-    #[arg(help = "keyboard target")]
-    keyboard: String,
+enum Cli {
+    #[command(about = "clean keyboard target directory")]
+    Clean,
+
+    #[command(flatten)]
+    Keyboard(KeyboardCommand),
 }
 
-#[derive(Debug, ValueEnum, Clone, Copy)]
-enum BuildOptions {
-    #[value(
-        name = "build",
-        help = "cross-compile keyboard firmware into elf and hex"
-    )]
-    Build,
-    #[value(
-        name = "deploy",
-        help = "build and flash firmware into device using dfu-programmer"
-    )]
-    Deploy,
+#[derive(Subcommand)]
+#[command(about = "firmware build options")]
+enum KeyboardCommand {
+    #[command(about = "cross-compile keyboard firmware into elf and hex")]
+    Build(KeyboardOp),
+    #[command(about = "build and flash firmware into device using dfu-programmer")]
+    Deploy(KeyboardOp),
+}
+
+impl KeyboardCommand {
+    pub fn keyboard(&self) -> &KeyboardOp {
+        match self {
+            KeyboardCommand::Build(value) => value,
+            KeyboardCommand::Deploy(value) => value,
+        }
+    }
+}
+
+#[derive(Args)]
+struct KeyboardOp {
+    #[arg(help = "keyboard target")]
+    name: String,
 }
 
 fn main() {
@@ -49,21 +60,32 @@ fn main() {
         .try_init()
         .unwrap();
 
-    if let Err(err) = run(KeyboardCommand::parse()) {
+    if let Err(err) = run(Cli::parse()) {
         event!(Level::ERROR, "{:?}", err);
     }
 }
 
-fn run(cmd: KeyboardCommand) -> anyhow::Result<()> {
-    let keyboard = keyboard_dir();
-    let keyboard = Keyboard::new(&keyboard, &cmd.keyboard);
+fn run(cli: Cli) -> anyhow::Result<()> {
+    match cli {
+        Cli::Clean => run_clean(),
+        Cli::Keyboard(cmd) => run_keyboard(cmd),
+    }
+}
 
-    event!(Level::INFO, "keyboard: {}", keyboard.name());
-    event!(
-        Level::INFO,
-        "firmware_directory: {}",
-        keyboard.path().display()
-    );
+#[instrument(name = "clean", level = Level::INFO, skip_all)]
+fn run_clean() -> Result<(), anyhow::Error> {
+    event!(Level::INFO, "cleaning keyboard target directory...");
+
+    fs::remove_dir_all(keyboard_dir().join("target"))
+        .context("failed to clean target directory")?;
+
+    Ok(())
+}
+
+#[instrument(name = "keyboard", level = Level::INFO, skip_all)]
+fn run_keyboard(cmd: KeyboardCommand) -> anyhow::Result<()> {
+    let keyboard = keyboard_dir();
+    let keyboard = Keyboard::new(&keyboard, &cmd.keyboard().name);
 
     let config = {
         let path = keyboard.path().join("xtask.toml");
@@ -76,12 +98,12 @@ fn run(cmd: KeyboardCommand) -> anyhow::Result<()> {
         }
     };
 
-    match cmd.options {
-        BuildOptions::Build => {
+    match cmd {
+        KeyboardCommand::Build(_) => {
             build(&keyboard, &config.build)?;
         }
 
-        BuildOptions::Deploy => {
+        KeyboardCommand::Deploy(_) => {
             deploy(&keyboard, &config)?;
         }
     };
@@ -123,6 +145,13 @@ fn build(keyboard: &Keyboard, config: &BuildConfig) -> anyhow::Result<Executable
         pub path: PathContext,
         pub exec: Executable,
     }
+
+    event!(Level::INFO, "keyboard: {}", keyboard.name());
+    event!(
+        Level::INFO,
+        "firmware_directory: {}",
+        keyboard.path().display()
+    );
 
     event!(Level::INFO, "running pre-build commands");
     run_cmds(&config.pre_cmds, ()).context("pre-build commands failed")?;
@@ -174,6 +203,5 @@ pub fn keyboard_dir() -> PathBuf {
         .ancestors()
         .nth(1)
         .unwrap()
-        .join("firmware")
         .join("keyboard")
 }

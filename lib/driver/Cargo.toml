@@ -8,3 +8,7 @@ license = { workspace = true }
 publish = false
 
 [dependencies]
+usb-keyboard-config = { workspace = true }
+
+usb-device = "0.3.2"
+usbd-hid = "0.8.2"

@@ -1,0 +1,11 @@
+[workspace]
+members = ["*"]
+exclude = ["target"]
+resolver = "2"
+
+[workspace.dependencies]
+hid-key = { path = "../common/hid-key" }
+usb-keyboard-config = { path = "../common/config" }
+
+keyboard-driver = { path = "../lib/driver" }
+create-rmk-build = { path = "../lib/create-rmk-build" }

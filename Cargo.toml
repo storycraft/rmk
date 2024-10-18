@@ -1,9 +1,11 @@
 [workspace]
-members = ["xtask", "common/*"]
-exclude = ["firmware"]
-default-members = ["xtask"]
+members = ["xtask", "common/*", "lib/*"]
+exclude = ["keyboard"]
 resolver = "2"
 
 [workspace.package]
 authors = ["storycraft <storycraft@pancake.sh>"]
 license = "MIT OR Apache 2.0"
+
+[workspace.dependencies]
+usb-keyboard-config = { path = "./common/config" }

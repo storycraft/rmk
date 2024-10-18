@@ -7,7 +7,7 @@ name = "atmega-hal"
 version = "0.1.0"
 source = "git+https://github.com/rahix/avr-hal?branch=main#7e21ea0a468daee5cff9bed1c090a5e50e6879ff"
 dependencies = [
- "avr-device",
+ "avr-device 0.5.4",
  "avr-hal-generic",
 ]
 
@@ -16,7 +16,7 @@ name = "atmega-usbd"
 version = "0.1.0"
 source = "git+https://github.com/agausmann/atmega-usbd?branch=master#5fc68ca813ce0a37dab65dd4d66efe1ec125f2a8"
 dependencies = [
- "avr-device",
+ "avr-device 0.5.4",
  "usb-device",
 ]
 
@@ -26,7 +26,19 @@ version = "0.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "546b09da5e933d18b790ccb5aae351371c6c4f8094a7b011dcd7c7e7fb69cc94"
 dependencies = [
- "avr-device-macros",
+ "avr-device-macros 0.5.4",
+ "bare-metal",
+ "cfg-if",
+ "vcell",
+]
+
+[[package]]
+name = "avr-device"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33259ed405295178a53a19a8ac6eedb27497460939a25a3b44c0bf131599b1ad"
+dependencies = [
+ "avr-device-macros 0.6.0",
  "bare-metal",
  "cfg-if",
  "vcell",
@@ -44,11 +56,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "avr-device-macros"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96b4a8199737a5c595df8c7e19c0fe3b56eee0627e5ac7fac2098ebd674e1154"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "avr-hal-generic"
 version = "0.1.0"
 source = "git+https://github.com/rahix/avr-hal?branch=main#7e21ea0a468daee5cff9bed1c090a5e50e6879ff"
 dependencies = [
- "avr-device",
+ "avr-device 0.5.4",
  "cfg-if",
  "embedded-hal 0.2.7",
  "embedded-hal 1.0.0",
@@ -106,9 +129,9 @@ dependencies = [
 
 [[package]]
 name = "critical-section"
-version = "1.1.3"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f64009896348fc5af4222e9cf7d7d82a95a256c634ebcf61c53e4ea461422242"
+checksum = "790eea4361631c5e7d22598ecd5723ff611904e3344ce8720784c93e3d83d40b"
 
 [[package]]
 name = "derivative"
@@ -177,18 +200,18 @@ version = "0.1.0"
 
 [[package]]
 name = "impl-opaque"
-version = "0.5.0"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "316e1c19e6ddf6c2b0c58642d2329ae9ade7bce2b81a229aa669af68bf9a1372"
+checksum = "3045d2c7c47abcf9ef93c14bec5b5a78c1702639dcc9dea5d657b12855b47ac4"
 dependencies = [
  "impl-opaque-macro",
 ]
 
 [[package]]
 name = "impl-opaque-macro"
-version = "0.5.0"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ecac32b9c3a89075096a1ea686fab9d70db47986a4d89ad4d0563917380ccd7a"
+checksum = "d53cb9cf79afdf94a4fe0ada9a712d7183a3f56462368e3261696f4076db1053"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -204,10 +227,6 @@ dependencies = [
  "equivalent",
  "hashbrown",
 ]
-
-[[package]]
-name = "keyboard-driver"
-version = "0.1.0"
 
 [[package]]
 name = "memchr"
@@ -244,9 +263,9 @@ checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.87"
+version = "1.0.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3e4daa0dcf6feba26f985457cdf104d4b4256fc5a09547140f3631bb076b19a"
+checksum = "7c3a7fc5db1e57d5a779a352c8cdb57b29aa4c40cc69c3a68a7fedc815fbf2f9"
 dependencies = [
  "unicode-ident",
 ]
@@ -311,7 +330,7 @@ version = "0.1.0"
 dependencies = [
  "atmega-hal",
  "atmega-usbd",
- "avr-device",
+ "avr-device 0.6.0",
  "avr-progmem",
  "create-rmk-build",
  "embedded-hal 1.0.0",
