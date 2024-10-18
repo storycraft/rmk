@@ -87,6 +87,10 @@ fn run_keyboard(cmd: KeyboardCommand) -> anyhow::Result<()> {
     let keyboard = keyboard_dir();
     let keyboard = Keyboard::new(&keyboard, &cmd.keyboard().name);
 
+    if !fs::exists(keyboard.path())? {
+        bail!("keyboard {} does not exist", keyboard.name());
+    }
+
     let config = {
         let path = keyboard.path().join("xtask.toml");
 
