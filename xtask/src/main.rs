@@ -124,7 +124,7 @@ fn deploy(keyboard: &Keyboard<'_>, config: &Config) -> anyhow::Result<()> {
     }
 
     if config.deploy.cmds.is_empty() {
-        bail!("deploy commands are not configured")
+        bail!("deploy commands are not configured");
     }
 
     let exec = build(keyboard, &config.build)?;
