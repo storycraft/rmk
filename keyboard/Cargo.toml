@@ -8,4 +8,5 @@ hid-key = { path = "../common/hid-key" }
 usb-keyboard-config = { path = "../common/config" }
 
 keyboard-driver = { path = "../lib/driver" }
+create-rmk = { path = "../lib/create-rmk" }
 create-rmk-build = { path = "../lib/create-rmk-build" }

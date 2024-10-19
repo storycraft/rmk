@@ -12,3 +12,5 @@ usb-keyboard-config = { workspace = true }
 
 usb-device = "0.3.2"
 usbd-hid = "0.8.2"
+# temp fix for usbd-hid
+ssmarshal = { version = "1", features = [] }

@@ -10,4 +10,4 @@ publish = false
 serde = ["dep:serde"]
 
 [dependencies]
-serde = { version = "1", features = ["derive"], optional = true }
+serde = { version = "1", default-features = false, features = ["derive"], optional = true }
