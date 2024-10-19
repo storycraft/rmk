@@ -7,6 +7,6 @@ post_cmds = [
 [deploy]
 cmds = [
     "dfu-programmer atmega32u4 erase --force",
-    "dfu-programmer flash --force {{exec.full_path}}",
+    "dfu-programmer flash --force {{exec.directory}}{{path.separator}}{{exec.name}}.hex",
     "dfu-programmer atmega32u4 reset",
 ]
